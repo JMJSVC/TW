@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+    <head>
+        <meta charset=UTF-8>        <!-- para caracteres acentuados   -->
+        <title>4 em Linha</title>  <!-- texto na decoração da janela -->
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+
+        <div id="waiting" class="hidden">
+            <p>Aguardando resposta do servidor...</p>
+            <button class="hidden" onclick="leave()">Cancelar</button>
+        </div>
+
+        <div id="workspace">
+            <div class="header">
+                <h1>4 Em Linha</h1>
+
+                <div class="header-meta">
+                    <div class="user-data hidden">
+                        <h3>Bem vindo!</h3>
+                        <button onclick="logout()">Log Out</button>
+                    </div>
+
+                    <form class="auth" onsubmit="return register()">
+                        <input type="text" id="username" placeholder="Nick" value="joaomnb">
+                        <input type="password" id="password" placeholder="Pass" value="123456">
+                        <button>Log In</button>
+                    </form>
+                </div>
+
+            </div>
+            <div class="main-section row">
+                <div class="leftcolumn">
+                    <div class="card round board-container">
+                        <div class="loader"></div>
+                        <div id="board"></div>
+                    </div>
+                </div>
+                <div class="rightcolumn">
+                    <div class="card round">
+
+                        <h2>Configuração</h2>
+
+                        <div>
+                            <h3>Tamanho do tabuleiro:</h3>
+                            <div class="dimension-selector">
+                                <input type="text" id="size-rows" onchange="window.config.size.rows = parseInt( this.value )">
+                                <input type="text" id="size-columns" onchange="window.config.size.columns = parseInt( this.value )">
+                            </div>
+                        </div>
+
+                        <div id="settings-mode">
+                            <h3>Modo de jogo:</h3>
+                            <input type="radio" name="mode" id="mode-single" onclick="setMode('single')">
+                            <label for="mode-single">
+                                <span class="color_a">Single-player</span>
+                            </label>
+                            <input type="radio" name="mode" id="mode-multi" onclick="setMode('multi')" disabled>
+                            <label for="mode-multi">
+                                <span class="color_a">Multi-player</span>
+                            </label>
+                        </div>
+
+                        <div class="single-only">
+                            <div id="settings-turn">
+                                <h3>Primeiro a jogar:</h3>
+                                <input type="radio" name="first" id="first-me" onclick="window.config.first = 'me'">
+                                <label for="first-me"><span class="color_a">Utilizador</span></label>
+                                <input type="radio" name="first" id="first-other" onclick="window.config.first = 'other'">
+                                <label for="first-other"><span class="color_b">Adversário</span></label>
+                            </div>
+
+                            <div id="settings-ia">
+                                <h3>Nível de IA:</h3>
+                                <input type="radio" name="ai" id="ai-random" value="1" checked>
+                                <label for="ai-random">Aleatório</label>
+                                <input type="radio" name="ai" id="ai-easy" value="2" disabled>
+                                <label for="ai-easy">Fácil</label>
+                                <input type="radio" name="ai" id="ai-hard" value="3" disabled>
+                                <label for="ai-hard">Difícil</label>
+                            </div>
+                        </div>
+
+                        <br>
+                        <button id="results-button">Classificações</button>
+                        <button id="guide-button">Guia</button>
+
+                        <button id="start-button" onclick="start()">Iniciar</button>
+                        <button id="quit-button" onclick="leave()" class="hidden">Desistir</button>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer">
+                <h2>Trabalho Realizado Por: Joao Neves e Joao Carvalho</h2>
+                <h4>up201406377  ||  up201405833</h4>
+            </div>
+
+
+            <div id="scoreboard" class="modal">
+
+                <h2>Classificações</h2>
+
+                <div class="close">x</div>
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>Jogador</th>
+                            <th>Vitórias</th>
+                            <th>Empates</th>
+                            <th>Derrotas</th>
+                        </tr>
+
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Navy</td>
+                            <td class="blue-win">0</td>
+                            <td class="blue-draw">0</td>
+                            <td class="blue-loss">0</td>
+                        </tr>
+
+                        <tr>
+                            <td>Amarelo</td>
+                            <td class="red-win">0</td>
+                            <td class="red-draw">0</td>
+                            <td class="red-loss">0</td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <div id="guide" class="modal">
+
+                <h2>Guia de Jogo</h2>
+                <p>O quatro em linha joga-se numa grelha (geralmente 6 x 7)
+                    colocada na vertical. As peças colocadas numa das aberturas
+                    no topo da grelha caiem ao longo de calhas e ocupam a
+                    primeira posição livre, seja no fundo da grelha ou sobre
+                    outra peça. Cada jogador joga com peças de cor diferente e
+                    alternadamente coloca uma peça numa das calhas ainda não completamente
+                    preenchidas. Ganha o primeiro jogador que conseguir colocar
+                    4 peças da sua cor alinhadas, na vertical, horizontal ou
+                    diagonal.</p>
+
+
+                <div class="close">x</div>
+
+            </div>
+
+        </div>
+
+
+        <script src="board.js"></script>
+    </body>
+
+</html>
