@@ -276,17 +276,30 @@ function verify() {
         }
         gameStatus.gameOver = true;
 
-        scoreboardModal.querySelector('.blue-win').innerHTML  = gameScores[0].win;
-        scoreboardModal.querySelector('.blue-draw').innerHTML = gameScores[0].draw;
-        scoreboardModal.querySelector('.blue-loss').innerHTML = gameScores[0].loss;
+        // scoreboardModal.querySelector('.blue-win').innerHTML  = gameScores[0].win;
+        // scoreboardModal.querySelector('.blue-draw').innerHTML = gameScores[0].draw;
+        // scoreboardModal.querySelector('.blue-loss').innerHTML = gameScores[0].loss;
 
-        scoreboardModal.querySelector('.red-win').innerHTML  = gameScores[1].win;
-        scoreboardModal.querySelector('.red-draw').innerHTML = gameScores[1].draw;
-        scoreboardModal.querySelector('.red-loss').innerHTML = gameScores[1].loss;
+        // scoreboardModal.querySelector('.red-win').innerHTML  = gameScores[1].win;
+        // scoreboardModal.querySelector('.red-draw').innerHTML = gameScores[1].draw;
+        // scoreboardModal.querySelector('.red-loss').innerHTML = gameScores[1].loss;
 
-        showScoreboard();
-        document.querySelector("#start-button").disabled = false;
-        document.querySelector("#quit-button").disabled = true;
+        // showScoreboard();
+        // document.querySelector("#start-button").disabled = false;
+        // document.querySelector("#quit-button").disabled = true;
+
+        // ESTRUTURA DO SCOREBOARD
+        // scoreboard = {
+        //     '5-5': [
+        //         { nick: 'a', victories: 0, games: 0 },
+        //         { nick: 'b', victories: 0, games: 0 },
+        //     ],
+        //     '6-6': [
+        //         { nick: 'a', victories: 0, games: 0 },
+        //         { nick: 'b', victories: 0, games: 0 },
+        //     ]
+        // }
+
     }
 
     return false;
@@ -347,7 +360,6 @@ function cpuTurn() {
     pickColumn();
 }
 
-function showScoreboard() { scoreboardModal.className = "modal open"; }
 function hideScoreboard() { scoreboardModal.className = "modal"; }
 
 function showGuide() { guideModal.className = "modal open"; }
@@ -384,10 +396,10 @@ document.querySelector("#guide-button").onclick = function () {
     hideScoreboard();
 };
 
-document.querySelector("#results-button").onclick = function () {
-    showScoreboard();
-    hideGuide();
-};
+// document.querySelector("#results-button").onclick = function () {
+//     showScoreboard();
+//     hideGuide();
+// };
 
 document.querySelectorAll(".modal .close").forEach(function (closeButton) {
     closeButton.onclick = function (event) {
@@ -591,6 +603,66 @@ function turn ( player ) {
 
 }
 
+function ranking () {
+    let size = window.config.size
+    return post('ranking', { size }).then(response => response.json())
+}
+
+function renderScoreboard ( data ) {
+    let tableBody = document.querySelector('#scoreboard tbody')
+    tableBody.innerHTML = ""
+
+    data.forEach(element => {
+
+        let tr = document.createElement('tr')
+
+        let nick      = document.createElement('td')
+        let games     = document.createElement('td')
+        let victories = document.createElement('td')
+
+        nick.innerText      = element.nick
+        games.innerText     = element.games
+        victories.innerText = element.victories
+
+        tr.appendChild( nick )
+        tr.appendChild( games )
+        tr.appendChild( victories )
+
+        tableBody.appendChild( tr )
+
+    })
+}
+
+function clearScoreboard () {
+    document.querySelector('#scoreboard tbody').innerHTML = ""
+}
+
+function showScoreboard () {
+    hideGuide()
+
+
+    if ( window.auth ) {
+
+        waiting()
+
+        ranking().then(data => {
+
+            renderScoreboard( data.ranking )
+            resume()
+
+        })
+
+    } else {
+
+        let scoreboard = JSON.parse( localStorage.getItem('scoreboard') )
+        let key = `${window.config.size.rows}-${window.config.size.columns}`
+
+        renderScoreboard( scoreboard[key] || {} )
+    }
+
+    document.querySelector('#scoreboard').classList.add("open")
+}
+
 function newUpdate (event) {
     const data = JSON.parse( event.data )
     console.log('Updated:')
@@ -632,6 +704,43 @@ function newUpdate (event) {
     resume()
 }
 
+function updateSingleScoreboard ( winner, loser ) {
+    let key = `${window.config.size.rows}-${window.config.size.columns}`
+
+    let scoreboard = JSON.parse( localStorage.getItem('scoreboard') ) || {}
+
+    if ( ! scoreboard[ key ] ) {
+        scoreboard[ key ] = []
+    }
+
+    let foundWinner = false
+    let foundLoser  = false
+
+    scoreboard[key].forEach(element => {
+
+        if ( element.nick == winner ) {
+            foundWinner = true
+            element.victories++
+            element.games++
+        }
+
+        if ( element.nick == loser ) {
+            foundLoser = true
+            element.games++
+        }
+
+    })
+
+    if ( ! foundWinner ) {
+        scoreboard[key].push( { nick: winner, victories: 1, games: 1 } )
+    }
+
+    if ( ! foundLoser ) {
+        scoreboard[key].push( { nick: loser, victories: 0, games: 1 } )
+    }
+
+    localStorage.setItem('scoreboard', JSON.stringify(scoreboard))
+}
 
 
 
